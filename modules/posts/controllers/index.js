@@ -38,6 +38,7 @@ const createUserPosts = async (req, res) => {
 }
 
 const getUserPosts = async (req, res) => {
+    console.log(req.isAdmin);
     const userId = req.user.id;
     const page = req.query.page;
     const pageSize = req.query.pagesize;
@@ -91,7 +92,7 @@ const updatePost = async (req, res) => {
     try {
         const data = await postSchema.validateAsync(req.body);
         const post = await getPostFromMongo(postId);
-        if (post.user != userId) {
+        if ((post.user != userId) && !req.isAdmin) {
             customError(403, 'Unauthorised')
         }
         const { title, description } = data;

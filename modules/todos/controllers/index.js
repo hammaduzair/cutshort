@@ -53,7 +53,7 @@ const deleteTodo = async (req, res) => {
     const userId = req.user.id;
     try {
         const todo = await getTodoFromMongo(todoId);
-        if (todo.user != userId) {
+        if (todo.user != userId  && !req.isAdmin) {
             customError(403, 'Unauthorised')
         }
         const updateObj = {
@@ -74,7 +74,7 @@ const updateTodo = async (req, res) => {
         const data = await postSchema.validateAsync(req.body);
         const { title, completed } = data;
         const todo = await getTodoFromMongo(todoId);
-        if (todo.user != userId) {
+        if (todo.user != userId && !req.isAdmin) {
             customError(403, 'Unauthorised')
         }
         const updateObj = {

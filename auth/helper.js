@@ -35,7 +35,15 @@ const verifytoken = (req, res, next) => {
     }
 }
 
+const checkIfAdmin = (req, res, next) => {
+    if((req.user.roles || []).includes('admin')) {
+        req.isAdmin = true;
+    }
+    next();
+}
+
 module.exports = {
     getJwtToken,
-    verifytoken
+    verifytoken,
+    checkIfAdmin
 }
