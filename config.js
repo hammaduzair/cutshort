@@ -2,8 +2,6 @@ module.exports = {
     db: {
 		uri: process.env.MONGODBURI,
 		options: {
-/* 			poolSize: process.env.DB_POOL_SIZE || 20, */
-			/* keepAlive: 30000, */
 			connectTimeoutMS: 80000,
 			socketTimeoutMS: 360000,
 			w: "majority",

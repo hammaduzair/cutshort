@@ -2,7 +2,7 @@ const { get } = require('lodash');
 
 /**
  * Create custom error
- * @param {number} statusCode Response status code
+ * @param {number} status Response status code
  * @param {string} message Response error message
  * @returns Error Object with custom status code and error message
  */

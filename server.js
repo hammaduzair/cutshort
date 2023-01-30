@@ -2,10 +2,6 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const redis = require("redis");
 const config = require('./config');
-const configC = require('./config/config');
-const path = require('path');
-
-console.log(process.env);
 const port = process.env.PORT;
 
 console.log("MongoDB Config :", config.db);
@@ -19,7 +15,6 @@ mongoose.connection.on('disconnected', function () {
 });
 
 mongoose.connection.on('error', function(err) {
-  console.log(config.db.uri);
     console.error('MongoDB connection error: ' + err);
     process.exit(-1);
   }
@@ -41,10 +36,7 @@ let redisClient;
 
 const app = require('./config/express')(mongoose);
 
-
-configC.getGlobbedFiles('./routes/**/*.js').forEach(function (routePath) {
-  require(path.resolve(routePath))(app);
-});
+require('./routes.js')(app);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

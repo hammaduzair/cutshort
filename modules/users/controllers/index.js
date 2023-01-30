@@ -9,12 +9,13 @@ const {
 } = require("../../../helpers/common");
 
 const { getJwtToken } = require('../../../auth/helper');
+const { registerSchema, loginSchema } = require('../validators');
 const { get } = require('lodash');
 
 const createUser = async (req, res) => {
-    const data = req.body;
     try {
-        const user = await createUserInMongo(data);
+        const data = await registerSchema.validateAsync(req.body);
+        await createUserInMongo(data);
         sendOK(res, { message: 'Success' });
     } catch (err) {
         console.error('ERROR | getGiftFinderResults | ', err);
@@ -23,15 +24,11 @@ const createUser = async (req, res) => {
 }
 
 const loginUser = async (req, res) => {
-    const data = req.body;
-    const { email, password } = data;
-    if (!(email && password)) {
-        res.status(400).send("All input is required");
-    }
     try {
+        const data = await loginSchema.validateAsync(req.body);
+        const { email, password } = data;
         const user = await findUserInMongo(email);
-        console.log(user)
-        if (user.password == password) {
+        if (user.authenticate(password)) {
             const token = getJwtToken(user);
             const lastRefreshToken = get(user, 'refreshToken.value', randtoken.uid(256));
             const refreshToken = {
@@ -50,12 +47,7 @@ const loginUser = async (req, res) => {
     }
 }
 
-const getUser = (req, res) => {
-    console.log(req.user);
-}
-
 module.exports = {
     createUser,
-    loginUser,
-    getUser
+    loginUser
 }

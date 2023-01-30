@@ -11,6 +11,10 @@ const {
     updateTodoInMongo
 } = require('../dals');
 
+const {
+    todoSchema
+} = require('../validators');
+
 const createTodo = async (req, res) => {
     const data = req.body;
     const { title } = data;
@@ -66,8 +70,9 @@ const deleteTodo = async (req, res) => {
 const updateTodo = async (req, res) => {
     const todoId = req.params.id;
     const userId = req.user.id;
-    const { title, completed } = req.body;
     try {
+        const data = await postSchema.validateAsync(req.body);
+        const { title, completed } = data;
         const todo = await getTodoFromMongo(todoId);
         if (todo.user != userId) {
             customError(403, 'Unauthorised')

@@ -13,17 +13,28 @@ const {
 
 const { writeAroundCache } = require('../../../core/redis');
 
+const {
+    postSchema,
+    commentSchema
+} = require('../validators');
+
 const config = require('../../../config');
 
 const createUserPosts = async (req, res) => {
-    const data = req.body;
-    const post = {
-        title: data.title,
-        description: data.description,
-        user: req.user.id
+    try {
+        const data = await postSchema.validateAsync(req.body);
+        const post = {
+            title: data.title,
+            description: data.description,
+            user: req.user.id
+        }
+        await createUserPostsinMongo(post);
+        sendOK(res, { message: 'success' });
+    } catch (err) {
+        console.error('ERROR | createUserPosts | ', err);
+        sendError(res, err);
     }
-    await createUserPostsinMongo(post);
-    sendOK(res, { message: 'success' });
+    
 }
 
 const getUserPosts = async (req, res) => {
@@ -45,6 +56,14 @@ const getSinglePost = async (req, res) => {
         comments: response[1]
     }
     sendOK(res, post);
+}
+
+const getPostComments = async (req, res) => {
+    const postId = req.params.id;
+    const page = req.query.page;
+    const pageSize = req.query.pagesize;
+    const comments = await getPostCommentsFromMongo(postId, page, pageSize);
+    sendOK(res, comments);
 }
 
 const deletePost = async (req, res) => {
@@ -69,12 +88,13 @@ const deletePost = async (req, res) => {
 const updatePost = async (req, res) => {
     const postId = req.params.id;
     const userId = req.user.id;
-    const { title, description } = req.body;
     try {
+        const data = await postSchema.validateAsync(req.body);
         const post = await getPostFromMongo(postId);
         if (post.user != userId) {
             customError(403, 'Unauthorised')
         }
+        const { title, description } = data;
         const updateObj = {
             ...title && { title },
             ...description && { description }
@@ -88,22 +108,28 @@ const updatePost = async (req, res) => {
 }
 
 const addCommentToPost = async (req, res) => {
-    const data = req.body;
-    const { comment, postId } = data;
-    const userId = req.user.id;
-    const obj = {
-        user: userId,
-        comment,
-        post: postId
+    try {
+        const data = await commentSchema.validateAsync(req.body);
+        const { comment, postId } = data;
+        const userId = req.user.id;
+        const obj = {
+            user: userId,
+            comment,
+            post: postId
+        }
+        await createPostCommentinMongo(obj);
+        sendOK(res, { message: 'success' });
+    } catch (err) {
+        console.log('Error | addCommentToPost ', err);
+        sendError(res, err);
     }
-    await createPostCommentinMongo(obj);
-    sendOK(res, { message: 'success' });
 }
 
 module.exports = {
     createUserPosts,
     getUserPosts,
     getSinglePost,
+    getPostComments,
     deletePost,
     updatePost,
     addCommentToPost

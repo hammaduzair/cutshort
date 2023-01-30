@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const config = require('../config');
 
 const UserSchema = new Schema({
@@ -94,25 +94,27 @@ UserSchema.index({
 
 UserSchema.pre(
     'save',
-    async function (next) {
-        const user = this;
-        this.salt = await bcrypt.genSalt(10);
-        this.password = await this.hashPassword(this.password);
-
+    function (next) {
+        const user = this;;
+        this.salt = crypto.randomBytes(16).toString('base64');
+        this.password = this.hashPassword(this.password, this.salt);
         next();
     }
 );
 
-UserSchema.methods.hashPassword = async (password) => {
-    if (this.salt && password) {
-        return await bcrypt.hash(this.password, salt);
+UserSchema.methods.hashPassword = function (password, salt) {
+    const pwdSalt = salt || this.salt;
+    if (pwdSalt && password) {
+        const hashedPassword = crypto.pbkdf2Sync(password, new Buffer(pwdSalt, 'base64'), 10000, 64, 'sha1').toString('base64');
+        return hashedPassword;
     } else {
         return password;
     }
 };
 
-UserSchema.methods.authenticate = async (password) => {
-    return this.password === await this.hashPassword(password);
+UserSchema.methods.authenticate = function (password) {
+    const hashedPassword = this.hashPassword(password);
+    return hashedPassword == this.password;
 };
 
 mongoose.model('User', UserSchema);
