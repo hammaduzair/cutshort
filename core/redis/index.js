@@ -1,5 +1,5 @@
 const redis = require("ioredis");
-const config = require('../../config');
+const config = require('@config');
 const redisClient = new redis(config.redis);
 
 /* get redis key value if exists */

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const crypto = require('crypto');
-const config = require('../config');
+const config = require('@config');
 
 const UserSchema = new Schema({
     email: {

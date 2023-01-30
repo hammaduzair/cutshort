@@ -9,16 +9,16 @@ const {
     customError,
     sendError,
     sendOK
-} = require("../../../helpers/common");
+} = require("@helpers/common");
 
-const { writeAroundCache } = require('../../../core/redis');
+const { writeAroundCache } = require('@core/redis');
 
 const {
     postSchema,
     commentSchema
 } = require('../validators');
 
-const config = require('../../../config');
+const config = require('@config');
 
 const createUserPosts = async (req, res) => {
     try {

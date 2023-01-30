@@ -1,12 +1,12 @@
 const randtoken = require('rand-token');
-const config = require('../../../config');
+const config = require('@config');
 
 const { createUserInMongo, findUserInMongo } = require('../dals');
 const {
     customError,
     sendError,
     sendOK
-} = require("../../../helpers/common");
+} = require("@helpers/common");
 
 const { getJwtToken } = require('../../../auth/helper');
 const { registerSchema, loginSchema } = require('../validators');

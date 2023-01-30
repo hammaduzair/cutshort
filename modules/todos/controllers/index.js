@@ -2,7 +2,7 @@ const {
     customError,
     sendError,
     sendOK
-} = require("../../../helpers/common");
+} = require("@helpers/common");
 
 const {
     createNewTodoInMongo,

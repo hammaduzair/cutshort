@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const config = require('../config'); 
 
 const PostSchema = new Schema({
     title: {
