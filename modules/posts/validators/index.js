@@ -7,7 +7,7 @@ const postSchema = Joi.object({
 
 const commentSchema = Joi.object({
     comment: Joi.string().required(),
-    post: Joi.string().required()
+    postId: Joi.string().required()
 });
 
 module.exports = {

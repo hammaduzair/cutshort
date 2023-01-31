@@ -21,7 +21,7 @@ router.route('/:id')
 router.route('/comments/:id')
     .get(getPostComments)
 
-router.route('/comment')
+router.route('/comments')
     .post(verifytoken, addCommentToPost)
 
 module.exports = router;
