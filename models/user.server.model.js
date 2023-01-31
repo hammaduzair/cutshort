@@ -6,7 +6,7 @@ const config = require('@config');
 const UserSchema = new Schema({
     email: {
         type: String,
-        unique: "Email already exists",
+        index: { unique: true },
         trim: true,
         required: 'Please fill in a email',
         match: [/.+\@.+\..+/, 'Please fill a valid email address']
@@ -82,10 +82,6 @@ const UserSchema = new Schema({
         }],
         default: ['user']
     },
-});
-
-UserSchema.index({
-    email: 1,
 });
 
 /**
