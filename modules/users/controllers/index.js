@@ -8,7 +8,7 @@ const {
     sendOK
 } = require("@helpers/common");
 
-const { getJwtToken } = require('../../../auth/helper');
+const { getJwtToken } = require('@helpers/auth');
 const { registerSchema, loginSchema } = require('../validators');
 const { get } = require('lodash');
 

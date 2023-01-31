@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const { verifytoken, checkIfAdmin } = require('../../../auth/helper');
+const { verifytoken } = require('@helpers/auth');
 const { createTodo, getTodos, updateTodo, deleteTodo } = require('../controllers');
 
 router.route('/')
@@ -9,7 +9,7 @@ router.route('/')
 router.get('/:userId', getTodos)
 
 router.route('/:id')
-    .put(verifytoken, checkIfAdmin, updateTodo)
-    .delete(verifytoken, checkIfAdmin, deleteTodo);
+    .put(verifytoken, updateTodo)
+    .delete(verifytoken, deleteTodo);
 
 module.exports = router;

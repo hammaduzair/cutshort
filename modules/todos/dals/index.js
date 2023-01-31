@@ -5,10 +5,14 @@ const createNewTodoInMongo = obj => {
     return Todo.create(obj);
 }
 
-const getUserTodosFromMongo = (userId, page = 1, pageSize = 5) => {
+const getUserTodosFromMongo = (userId, page = 1, pageSize = 5, search) => {
     const limit = pageSize;
     const skip = (page - 1) * pageSize;
-    return Todo.find({ user: userId, deleted: false })
+    const queryObj = { user: userId, deleted: false };
+    if (search) {
+        queryObj.title = new RegExp(search, "i");
+    }
+    return Todo.find(queryObj)
         .skip(skip)
         .limit(limit);
 }

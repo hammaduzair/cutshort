@@ -21,7 +21,7 @@ const createTodo = async (req, res) => {
     const userId = req.user.id;
     try {
         if (!title) {
-            customError(400, 'missing title')
+            throw customError(400, 'missing title')
         }
         const obj = {
             title,
@@ -39,8 +39,9 @@ const getTodos = async (req, res) => {
     const userId = req.params.userId;
     const page = req.query.page;
     const pageSize = req.query.pagesize;
+    const search = req.query.search;
     try {
-        const todos = await getUserTodosFromMongo(userId, page, pageSize);
+        const todos = await getUserTodosFromMongo(userId, page, pageSize, search);
         sendOK(res, todos)
     } catch (err) {
         console.log('Error | CreateTodo ', err);
@@ -53,8 +54,8 @@ const deleteTodo = async (req, res) => {
     const userId = req.user.id;
     try {
         const todo = await getTodoFromMongo(todoId);
-        if (todo.user != userId  && !req.isAdmin) {
-            customError(403, 'Unauthorised')
+        if (!req.isAdmin && todo.user != userId) {
+            throw customError(403, 'Unauthorised')
         }
         const updateObj = {
             deleted: true
@@ -71,11 +72,11 @@ const updateTodo = async (req, res) => {
     const todoId = req.params.id;
     const userId = req.user.id;
     try {
-        const data = await postSchema.validateAsync(req.body);
+        const data = await todoSchema.validateAsync(req.body);
         const { title, completed } = data;
         const todo = await getTodoFromMongo(todoId);
-        if (todo.user != userId && !req.isAdmin) {
-            customError(403, 'Unauthorised')
+        if (!req.isAdmin && todo.user != userId) {
+            throw  customError(403, 'Unauthorised')
         }
         const updateObj = {
             ...title && { title },

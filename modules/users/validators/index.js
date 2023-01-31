@@ -30,7 +30,7 @@ const registerSchema = Joi.object({
 
 const loginSchema = Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().min(3).max(15).required()
+    password: Joi.string().required()
 });
 
 module.exports = {

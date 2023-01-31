@@ -26,16 +26,17 @@ const setCacheStringByKey = (key, object, ttl = 100) => {
     });
 };
 
-/* gets value from redis if exists, otherwise it performs the operation provided and sets the value returned in cache
-    expected params:
-    cacheKey(string): redis key,
-    ttl(number): key time to live,
-    rebuildCache(boolean): if true get data from operations instead of cache and update cache,
-    operations(function): functions to be called if no cache value exists for given key,
-    args(separate keys): no/single/mutiple values that will be passed as params in the operations function
-
-    ex: writeAroundCache(rediskey, 100, false, getUserPostsFromMongo, userId, page, pageSize) -> will perform getUserPostsFromMongo(userId, page, pageSize) if no cache value exists
-*/
+/**
+ * Send error message in response to the request
+ * @param {string} cacheKey redis key
+ * @param {number} ttl time to live
+ * @param {boolean} rebuildCache if true, get data from operations instead of cache and update cache,
+ * @param {function} operations  function to be called if no cache value exists for given key,
+ * @param {number} ttl time to live
+ * @param args no/single/mutiple values that will be passed as params in the operations function
+ * @returns value from cache if it exists, otherwise fetch data from operations and set it cache and return value
+ * ex: writeAroundCache(rediskey, 100, false, getUserPostsFromMongo, userId, page, pageSize) -> will perform getUserPostsFromMongo(userId, page, pageSize) if no cache value exists
+ */
 const writeAroundCache = async (cacheKey, ttl, rebuildCache, operations, ...args) => {
     let response = await getCachedStringByKey(cacheKey);
     if (!response || rebuildCache) {

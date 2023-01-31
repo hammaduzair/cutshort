@@ -38,32 +38,23 @@ const createUserPosts = async (req, res) => {
 }
 
 const getUserPosts = async (req, res) => {
-    console.log(req.isAdmin);
     const userId = req.user.id;
-    const page = req.query.page;
-    const pageSize = req.query.pagesize;
-    const rediskey = `${config.redisKey.posts}:${page}:${pageSize}`;
-    const posts = await writeAroundCache(rediskey, 100, false, getUserPostsFromMongo, userId, page, pageSize);
+    const { page, pagesize } = req.query;
+    const rediskey = `${config.redisKey.posts}:${userId}:${page}:${pagesize}`;
+    const posts = await writeAroundCache(rediskey, 100, false, getUserPostsFromMongo, userId, page, pagesize);
     sendOK(res, posts);
 }
 
 const getSinglePost = async (req, res) => {
     const postId = req.params.id;
-    const page = req.query.page;
-    const pageSize = req.query.pagesize;
-    const response = await Promise.all([getPostFromMongo(postId), getPostCommentsFromMongo(postId, page, pageSize)]);
-    const post = {
-        ...response[0],
-        comments: response[1]
-    }
+    const post = await getPostFromMongo(postId);
     sendOK(res, post);
 }
 
 const getPostComments = async (req, res) => {
     const postId = req.params.id;
-    const page = req.query.page;
-    const pageSize = req.query.pagesize;
-    const comments = await getPostCommentsFromMongo(postId, page, pageSize);
+    const { page, pagesize } = req.query;
+    const comments = await getPostCommentsFromMongo(postId, page, pagesize);
     sendOK(res, comments);
 }
 
@@ -72,8 +63,8 @@ const deletePost = async (req, res) => {
     const userId = req.user.id;
     try {
         const post = await getPostFromMongo(postId);
-        if (post.user != userId) {
-            customError(403, 'Unauthorised')
+        if (!req.isAdmin && post.user != userId) {
+            throw customError(403, 'Unauthorised')
         }
         const updateObj = {
             deleted: true
@@ -90,10 +81,10 @@ const updatePost = async (req, res) => {
     const postId = req.params.id;
     const userId = req.user.id;
     try {
-        const data = await postSchema.validateAsync(req.body);
+        const data = req.body;
         const post = await getPostFromMongo(postId);
-        if ((post.user != userId) && !req.isAdmin) {
-            customError(403, 'Unauthorised')
+        if (!req.isAdmin && (post.user != userId)) {
+            throw customError(403, 'Unauthorised')
         }
         const { title, description } = data;
         const updateObj = {

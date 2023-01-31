@@ -22,11 +22,15 @@ const getJwtToken = (user) => {
 };
 
 const verifytoken = (req, res, next) => {
+
     const token = (get(req, 'headers.authorization') || '').substring(7);
     try {
         const verify = jwt.verify(token, config.jwtAuth.secret);
         if (verify) {
-            req.user = (verify.data);
+            const user = verify.data;
+            console.log(user)
+            req.user = user;
+            req.isAdmin = (user.roles || []).includes('admin');
             next()
         }
     } catch (e) {
@@ -35,15 +39,7 @@ const verifytoken = (req, res, next) => {
     }
 }
 
-const checkIfAdmin = (req, res, next) => {
-    if((req.user.roles || []).includes('admin')) {
-        req.isAdmin = true;
-    }
-    next();
-}
-
 module.exports = {
     getJwtToken,
-    verifytoken,
-    checkIfAdmin
+    verifytoken
 }

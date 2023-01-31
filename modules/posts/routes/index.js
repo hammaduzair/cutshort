@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const { verifytoken, checkIfAdmin } = require('../../../auth/helper');
+const { verifytoken } = require('@helpers/auth');
 const { createUserPosts,
     getUserPosts,
     getSinglePost,
@@ -15,7 +15,7 @@ router.route('/')
 
 router.route('/:id')
     .get(getSinglePost)
-    .put(verifytoken, checkIfAdmin, updatePost)
+    .put(verifytoken, updatePost)
     .delete(verifytoken, deletePost)
 
 router.route('/comments/:id')

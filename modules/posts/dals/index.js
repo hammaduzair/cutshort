@@ -15,7 +15,7 @@ const getUserPostsFromMongo = (userId, page = 1, pageSize = 5) => {
 }
 
 const getPostFromMongo = postId => {
-    return Post.find({ _id: postId });
+    return Post.findOne({ _id: postId });
 }
 
 const getPostCommentsFromMongo = (postId, page = 1, pageSize = 5) => {
